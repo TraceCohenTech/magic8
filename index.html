@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Magic 8 Ball</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #question {
+      width: 300px;
+      padding: 8px;
+      font-size: 1em;
+    }
+    #shakeBtn {
+      padding: 8px 16px;
+      font-size: 1em;
+      margin-left: 10px;
+    }
+    #ball {
+      margin: 30px auto;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff, #ccc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+      font-size: 1.2em;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ask the Magic 8 Ball</h1>
+  <p>Enter your question below, then click "Shake the Ball" for an answer.</p>
+  <input type="text" id="question" placeholder="Enter your question here...">
+  <button id="shakeBtn">Shake the Ball!</button>
+
+  <div id="ball">
+    <span id="answer">?</span>
+  </div>
+
+  <script>
+    // Define three sets of responses: wise, direct, and sarcastic.
+    const responses = {
+      wise: [
+        "Patience is a virtue—wait and see.",
+        "In time, all will be revealed.",
+        "Trust the journey and the answer will come."
+      ],
+      direct: [
+        "Yes.",
+        "No.",
+        "Maybe."
+      ],
+      sarcastic: [
+        "Oh sure, because magic balls always know best.",
+        "Maybe, but why are you even asking me?",
+        "Do you really think a ball can help you?"
+      ]
+    };
+
+    // Function to randomly pick one response from any category.
+    function getRandomResponse() {
+      const categories = Object.keys(responses);
+      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+      const categoryResponses = responses[randomCategory];
+      return categoryResponses[Math.floor(Math.random() * categoryResponses.length)];
+    }
+
+    document.getElementById('shakeBtn').addEventListener('click', function() {
+      const questionInput = document.getElementById('question');
+      const question = questionInput.value.trim();
+      const answerEl = document.getElementById('answer');
+
+      // Ensure the user has entered a question.
+      if (!question) {
+        answerEl.textContent = "Please ask a question!";
+        return;
+      }
+
+      // Show a "shaking" message.
+      answerEl.textContent = "Shaking...";
+      
+      // Simulate a delay for the shaking effect.
+      setTimeout(() => {
+        const answer = getRandomResponse();
+        answerEl.textContent = answer;
+      }, 1000); // 1-second delay before showing the answer.
+    });
+  </script>
+</body>
+</html>
