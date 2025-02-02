@@ -138,29 +138,6 @@
         opacity: 0;
       }
     }
-    /* History log container */
-    .history {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      max-height: 30%;
-      overflow-y: auto;
-      background: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      font-size: 1em;
-      padding: 10px;
-      box-sizing: border-box;
-      z-index: 15;
-    }
-    .history h2 {
-      margin-top: 0;
-    }
-    .history-entry {
-      margin-bottom: 5px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      padding-bottom: 5px;
-    }
   </style>
 </head>
 <body>
@@ -180,12 +157,6 @@
 
   <!-- Magical answer appears here -->
   <div class="magic-answer" id="magicAnswer"></div>
-
-  <!-- History log -->
-  <div class="history" id="history">
-    <h2>History</h2>
-    <div id="historyEntries"></div>
-  </div>
 
   <!-- Audio elements for sound effects (update the src with valid URLs) -->
   <audio id="shakeSound" src="https://example.com/shake.mp3" preload="auto"></audio>
@@ -230,9 +201,8 @@
     const magicAnswer = document.getElementById('magicAnswer');
     const shakeSound = document.getElementById('shakeSound');
     const chimeSound = document.getElementById('chimeSound');
-    const historyEntries = document.getElementById('historyEntries');
 
-    // Handle button click.
+    // Handle the Shake button click.
     shakeBtn.addEventListener('click', () => {
       const question = questionInput.value.trim();
       if (!question) {
@@ -240,22 +210,22 @@
         return;
       }
       
-      // Play shake sound.
+      // Play the shake sound.
       shakeSound.currentTime = 0;
       shakeSound.play();
 
-      // Clear any previous magical answer and show the shaking state.
+      // Clear any previous magical answer and start the shaking.
       magicAnswer.textContent = "";
       answerWindow.textContent = "Shaking...";
       ball.classList.add('shaking');
 
-      // Delay to simulate shaking.
+      // Delay to simulate the shaking effect.
       setTimeout(() => {
         ball.classList.remove('shaking');
         const answer = getRandomResponse();
-        answerWindow.textContent = "?"; // Reset inner window.
+        answerWindow.textContent = "?"; // Reset the inner window.
 
-        // Play chime sound.
+        // Play the chime sound.
         chimeSound.currentTime = 0;
         chimeSound.play();
 
@@ -269,12 +239,6 @@
           spread: 80,
           origin: { y: 0.6 }
         });
-
-        // Log the question and answer in the history.
-        const entry = document.createElement('div');
-        entry.className = 'history-entry';
-        entry.innerHTML = `<strong>Q:</strong> ${question} <br> <strong>A:</strong> ${answer}`;
-        historyEntries.prepend(entry); // Newest on top.
 
         // Clear the question input for the next question.
         questionInput.value = "";
