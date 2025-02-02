@@ -2,48 +2,165 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Magic 8 Ball</title>
+  <title>Magical Magic 8 Ball</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #111;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .header {
       text-align: center;
-      margin-top: 50px;
+      color: #fff;
+      z-index: 10;
     }
-    #question {
+
+    .controls {
+      z-index: 10;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 5px;
       width: 300px;
-      padding: 8px;
-      font-size: 1em;
+      margin-right: 10px;
     }
-    #shakeBtn {
-      padding: 8px 16px;
-      font-size: 1em;
-      margin-left: 10px;
+
+    button {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 5px;
+      background-color: #008CBA;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    #ball {
-      margin: 30px auto;
-      width: 200px;
-      height: 200px;
+    
+    button:hover {
+      background-color: #005f73;
+    }
+
+    /* The Magic 8 Ball takes up most of the screen */
+    .ball {
+      position: relative;
+      flex: 1;
+      max-width: 90vmin;
+      max-height: 90vmin;
+      width: 90vmin;
+      height: 90vmin;
+      background: radial-gradient(circle at 30% 30%, #555, #000);
       border-radius: 50%;
-      background: radial-gradient(circle, #fff, #ccc);
+      box-shadow: inset -10px -10px 30px rgba(0, 0, 0, 0.8),
+                  inset 10px 10px 30px rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-      font-size: 1.2em;
-      padding: 20px;
+      position: relative;
+    }
+
+    /* The blue answer window */
+    .answer-window {
+      position: absolute;
+      width: 40%;
+      height: 40%;
+      background: radial-gradient(circle at center, #4da6ff, #0059b3);
+      border: 5px solid #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px;
+      font-size: 1.5em;
+      line-height: 1.2;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Shaking animation for the ball */
+    .shaking {
+      animation: shake 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes shake {
+      0%   { transform: translate(0, 0) rotate(2deg); }
+      100% { transform: translate(0, 0) rotate(-2deg); }
+    }
+
+    /* Magical answer animation */
+    .magic-answer {
+      position: absolute;
+      top: 50%;
+      left: -100%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 2em;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0, 200, 255, 0.8);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+    }
+
+    @keyframes slideAcross {
+      0% {
+        left: -100%;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      50% {
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        left: 110%;
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="header">
+      <h1>Magic 8 Ball</h1>
+      <p>Ask your question and watch the magic happen!</p>
+    </div>
 
-  <h1>Ask the Magic 8 Ball</h1>
-  <p>Enter your question below, then click "Shake the Ball" for an answer.</p>
-  <input type="text" id="question" placeholder="Enter your question here...">
-  <button id="shakeBtn">Shake the Ball!</button>
+    <div class="ball" id="ball">
+      <div class="answer-window" id="answerWindow">?</div>
+    </div>
 
-  <div id="ball">
-    <span id="answer">?</span>
+    <div class="controls">
+      <input type="text" id="question" placeholder="Enter your question...">
+      <button id="shakeBtn">Shake the Ball!</button>
+    </div>
   </div>
+
+  <!-- Container for the magical answer animation -->
+  <div class="magic-answer" id="magicAnswer"></div>
 
   <script>
     // Define three sets of responses: wise, direct, and sarcastic.
@@ -73,25 +190,41 @@
       return categoryResponses[Math.floor(Math.random() * categoryResponses.length)];
     }
 
-    document.getElementById('shakeBtn').addEventListener('click', function() {
-      const questionInput = document.getElementById('question');
-      const question = questionInput.value.trim();
-      const answerEl = document.getElementById('answer');
+    const shakeBtn = document.getElementById('shakeBtn');
+    const answerWindow = document.getElementById('answerWindow');
+    const questionInput = document.getElementById('question');
+    const ball = document.getElementById('ball');
+    const magicAnswer = document.getElementById('magicAnswer');
 
-      // Ensure the user has entered a question.
+    shakeBtn.addEventListener('click', () => {
+      const question = questionInput.value.trim();
+
+      // Check if a question is provided.
       if (!question) {
-        answerEl.textContent = "Please ask a question!";
+        answerWindow.textContent = "Please ask a question!";
         return;
       }
 
-      // Show a "shaking" message.
-      answerEl.textContent = "Shaking...";
-      
-      // Simulate a delay for the shaking effect.
+      // Clear any previous magical answer and begin shaking
+      magicAnswer.textContent = "";
+      answerWindow.textContent = "Shaking...";
+      ball.classList.add('shaking');
+
+      // Simulate a delay for shaking the ball.
       setTimeout(() => {
+        ball.classList.remove('shaking');
         const answer = getRandomResponse();
-        answerEl.textContent = answer;
-      }, 1000); // 1-second delay before showing the answer.
+        answerWindow.textContent = "?"; // Reset the inner window
+
+        // Set up the magical answer animation
+        magicAnswer.textContent = answer;
+        magicAnswer.style.animation = "slideAcross 3s ease-out forwards";
+
+        // Optionally, remove the animation so that it can be re-triggered later.
+        magicAnswer.addEventListener('animationend', () => {
+          magicAnswer.style.animation = "";
+        }, { once: true });
+      }, 1500); // 1.5 seconds shaking delay
     });
   </script>
 </body>
